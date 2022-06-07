@@ -18,4 +18,22 @@ router.get('/', (request, response) => {
         });
 });
 
+router.get('/:id', (request, response) => {
+    Posts.findById(request.params.id)
+        .then(possiblePost => {
+            if (!possiblePost) {
+                response.status(404).json({
+                    message: 'The post with the specified ID does not exist'
+                });
+            } else {
+                response.json(possiblePost);
+            }
+        })
+        .catch(error => {
+            response.status(500).json({
+                message: 'The post information could not be retrieved'
+            });
+        });
+});
+
 module.exports = router;
