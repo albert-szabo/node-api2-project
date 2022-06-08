@@ -66,12 +66,47 @@ router.delete('/:id', async (request, response) => {
         });
     } else {
         Posts.remove(request.params.id)
-            .then(numberOfDeletedPosts => {
+            .then(numberOfPostsDeleted => {
                 response.json(possiblePost);
             })
             .catch(error => {
                 response.status(500).json({
                     message: 'The post could not be removed'
+                });
+            });
+    }
+});
+
+router.put('/:id', (request, response) => {
+    const { title, contents } = request.body;
+    if (!title || !contents ) {
+        response.status(400).json({
+            message: 'Please provide title and contents for the post'
+        });
+    } else {
+        Posts.findById(request.params.id)
+            .then(post => {
+                if (!post) {
+                    response.status(404).json({
+                        message: 'The post with the specified ID does not exist'
+                    });
+                } else {
+                    return Posts.update(request.params.id, request.body);
+                }
+            })
+            .then(numberOfPostsUpdated => {
+                if (numberOfPostsUpdated) {
+                    return Posts.findById(request.params.id);
+                }
+            })
+            .then(updatedPost => {
+                if (updatedPost) {
+                    response.json(updatedPost);
+                }
+            })
+            .catch(error => {
+                response.status(500).json({
+                    message: 'The post information could not be modified'
                 });
             });
     }
