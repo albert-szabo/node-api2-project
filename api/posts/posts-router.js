@@ -58,4 +58,23 @@ router.post('/', (request, response) => {
     }
 });
 
+router.delete('/:id', async (request, response) => {
+    const possiblePost = await Posts.findById(request.params.id);
+    if (!possiblePost) {
+        response.status(404).json({
+            message: 'The post with the specified ID does not exist'
+        });
+    } else {
+        Posts.remove(request.params.id)
+            .then(numberOfDeletedPosts => {
+                response.json(possiblePost);
+            })
+            .catch(error => {
+                response.status(500).json({
+                    message: 'The post could not be removed'
+                });
+            });
+    }
+});
+
 module.exports = router;
